@@ -42,13 +42,13 @@ public class ItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
-
+/**
+ * 浮动按钮功能
+ */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        /**
-         * 浮动按钮功能
-         */
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -69,11 +69,16 @@ public class ItemListActivity extends AppCompatActivity {
         /*
         设置itemlist项
          */
+
+
+        /*
+        !!!!!!!!!!!!设置listitem项
+         */
         View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
         /*
-        设置upitemlist项
+        ！！！！！！ 设置upitemlist项
          */
         View uprecyclerView = findViewById(R.id.upitem_list);
         assert uprecyclerView != null;
@@ -83,15 +88,28 @@ public class ItemListActivity extends AppCompatActivity {
     itemlist项初始化
      */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new DummyItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
     }
 
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    public static class DummyItemRecyclerViewAdapter
+            extends RecyclerView.Adapter<DummyItemRecyclerViewAdapter.ViewHolder> {
 
         private final ItemListActivity mParentActivity;
         private final List<DummyContent.DummyItem> mValues;
         private final boolean mTwoPane;
+        /*
+        初始化函数
+         */
+        DummyItemRecyclerViewAdapter(ItemListActivity parent,
+                                     List<DummyContent.DummyItem> items,
+                                     boolean twoPane) {
+            mValues = items;
+            mParentActivity = parent;
+            mTwoPane = twoPane;
+        }
+        /*
+        初始化点击方法
+         */
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             /*
@@ -116,28 +134,22 @@ public class ItemListActivity extends AppCompatActivity {
                 }
             }
         };
-        /*
-        初始化函数
-         */
-        SimpleItemRecyclerViewAdapter(ItemListActivity parent,
-                                      List<DummyContent.DummyItem> items,
-                                      boolean twoPane) {
-            mValues = items;
-            mParentActivity = parent;
-            mTwoPane = twoPane;
-        }
+
 
         @Override
         /*
-
+            初始化子项布局
          */
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_list_content, parent, false);
+                    .inflate(R.layout.dummytitem_list_content, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
+        /*
+            初始化子项数据
+         */
         public void onBindViewHolder(final ViewHolder holder, int position) {
            // holder.mIdView.setText(mValues.get(position).id);
             holder.mContentView.setText(mValues.get(position).content);
@@ -167,14 +179,26 @@ public class ItemListActivity extends AppCompatActivity {
     upitemlist项初始化
  */
     private void setupUpRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemUpRecyclerViewAdapter(this, UpperContent.ITEMS, mTwoPane));
+        recyclerView.setAdapter(new UpItemRecyclerViewAdapter(this, UpperContent.UPITEMS,UpperContent.ITEMS));
     }
-    public static class SimpleItemUpRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemUpRecyclerViewAdapter.ViewHolder> {
+    public static class UpItemRecyclerViewAdapter
+            extends RecyclerView.Adapter<UpItemRecyclerViewAdapter.ViewHolder> {
 
         private final ItemListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
-        private final boolean mTwoPane;
+        private final List<UpperContent.UpperItem> mValues;
+
+        /*
+        初始化函数
+         */
+        UpItemRecyclerViewAdapter(ItemListActivity parent,
+                                  List<UpperContent.UpperItem> upitems,
+                                  List<DummyContent.DummyItem> dummyItems) {
+            mValues = upitems;
+            mParentActivity = parent;
+        }
+        /*
+        点击事件：点击显示一组upperitem+dummyitem
+         */
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             /*
@@ -182,7 +206,9 @@ public class ItemListActivity extends AppCompatActivity {
              */
             public void onClick(View view) {
                 DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                /*
                 if (mTwoPane) {
+
                     Bundle arguments = new Bundle();
                     arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
                     ItemDetailFragment fragment = new ItemDetailFragment();
@@ -196,32 +222,30 @@ public class ItemListActivity extends AppCompatActivity {
                     intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
 
                     context.startActivity(intent);
-                }
+                }*/
             }
         };
 
-        SimpleItemUpRecyclerViewAdapter(ItemListActivity parent,
-                                      List<DummyContent.DummyItem> items,
-                                      boolean twoPane) {
-            mValues = items;
-            mParentActivity = parent;
-            mTwoPane = twoPane;
-        }
+
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_list_content, parent, false);
+                    .inflate(R.layout.dummytitem_list_content, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             // holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            /*
+            传值，设置holder的量
+             holder.mContentView.setText(mValues.get(position).upitemlist);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
+             */
+
         }
 
         @Override

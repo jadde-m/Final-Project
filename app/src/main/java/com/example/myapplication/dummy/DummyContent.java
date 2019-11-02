@@ -6,20 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
+ * 基本成就项
  */
 public class DummyContent {
 
     /**
-     * An array of sample (dummy) items.
+     * dummy item表
      */
     public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
 
     /**
-     * A map of sample (dummy) items, by ID.
+     * dummy item哈希表，用于初始化dummyitem
      */
     public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
@@ -51,7 +48,7 @@ public class DummyContent {
     }
 
     /**
-     * A dummy item representing a piece of content.
+     * dummyitem初始化.
      */
     public static class DummyItem {
         public final String id;
@@ -68,11 +65,5 @@ public class DummyContent {
             return content;
         }
     }
-
-    /**upperitem 上层文件
-     * 含id，不显示，content，显示
-     * 一组dummyitem
-     */
-
 
 }

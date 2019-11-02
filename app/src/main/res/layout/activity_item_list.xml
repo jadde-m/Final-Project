@@ -33,12 +33,23 @@
 
             <FrameLayout
                 android:id="@+id/upitemframe"
-                android:layout_width="150dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                 <include
                     layout="@layout/upitem_list" />
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorPrimary"
+                    android:minHeight="?attr/actionBarSize"
+                    android:theme="?attr/actionBarTheme"
+                    android:layout_gravity="bottom"
+                    />
 
             </FrameLayout>
 
@@ -51,7 +62,8 @@
 
             <FrameLayout
                 android:id="@+id/dummyitemframe"
-                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
