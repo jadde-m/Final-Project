@@ -85,7 +85,7 @@ public class ItemListActivity extends AppCompatActivity {
         setupUpRecyclerView((RecyclerView) uprecyclerView);
     }
     /*
-    itemlist项初始化
+    dummyitemlist项初始化
      */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new DummyItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
@@ -152,7 +152,7 @@ public class ItemListActivity extends AppCompatActivity {
          */
         public void onBindViewHolder(final ViewHolder holder, int position) {
            // holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mContentView.setText(mValues.get(position).name);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -179,7 +179,7 @@ public class ItemListActivity extends AppCompatActivity {
     upitemlist项初始化
  */
     private void setupUpRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new UpItemRecyclerViewAdapter(this, UpperContent.UPITEMS,UpperContent.ITEMS));
+        recyclerView.setAdapter(new UpItemRecyclerViewAdapter(this, UpperContent.UPITEMS));
     }
     public static class UpItemRecyclerViewAdapter
             extends RecyclerView.Adapter<UpItemRecyclerViewAdapter.ViewHolder> {
@@ -191,8 +191,7 @@ public class ItemListActivity extends AppCompatActivity {
         初始化函数
          */
         UpItemRecyclerViewAdapter(ItemListActivity parent,
-                                  List<UpperContent.UpperItem> upitems,
-                                  List<DummyContent.DummyItem> dummyItems) {
+                                  List<UpperContent.UpperItem> upitems) {
             mValues = upitems;
             mParentActivity = parent;
         }
