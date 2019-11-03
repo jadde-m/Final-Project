@@ -41,23 +41,23 @@
                 <include
                     layout="@layout/upitem_list" />
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar2"
+                <Button
+                    android:id="@+id/button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorPrimary"
-                    android:minHeight="?attr/actionBarSize"
-                    android:theme="?attr/actionBarTheme"
                     android:layout_gravity="bottom"
+                    android:text="返回上一级"
+                    android:onClick="returnmethod"
+                    android:background="#b71c1c"
+                    android:textColor="#ffebee"
                     />
+
 
             </FrameLayout>
 
             <View
-                android:id="@+id/divider"
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-
                 android:background="?android:attr/listDivider" />
 
             <FrameLayout

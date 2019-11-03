@@ -15,5 +15,8 @@
         android:onClick="Click"
         android:text="成就"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#b71c1c"
+        android:textColor="#ffebee"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.example.myapplication.dummy;
 
 import android.content.Context;
 import android.icu.text.CaseMap;
+import android.util.Log;
 
 import com.example.myapplication.ChengJiu;
 
@@ -18,8 +19,8 @@ public class UpperContent extends DummyContent{
     /**
      * An array of sample (dummy) items.
      */
-    public static final List<UpperContent.UpperItem> ITEMS = new ArrayList<UpperContent.UpperItem>();
-    public static final List<UpperContent.UpperItem> UPITEMS = new ArrayList<UpperContent.UpperItem>();
+    public  List<UpperContent.UpperItem> ITEMS = new ArrayList<UpperContent.UpperItem>();
+    public  List<UpperContent.UpperItem> UpITEMS = new ArrayList<UpperContent.UpperItem>();
 
     /**
      * A map of sample (dummy) items, by ID.
@@ -32,8 +33,9 @@ public class UpperContent extends DummyContent{
     /*
         一级upperitem初始化 包括dummyitem列表 upperitem列表，各自包含一哈希表
      */
-    public static final String path = "//wiki";
-    static void InitFirstUpperItem(Context context) throws IOException {
+    private static final String path = "wiki";
+    public void InitFirstUpperItem(Context context) throws IOException {
+        ITEMS.clear();
         String[] listFiles = context.getAssets().list(path);
         for(String listFile : listFiles){// /wiki/1
             /*
@@ -41,27 +43,26 @@ public class UpperContent extends DummyContent{
              */
             if(listFile.contains("txt")) continue;
             UpperContent secui = new UpperContent();
-            secui.InitSecondUpperItem(context,path+"//"+listFile); //处理下级目录中文件夹部分
+            secui.InitSecondUpperItem(context,path+"/"+listFile); //处理下级目录中文件夹部分
             DummyContent dc = new DummyContent();
-            dc.InitDummyItem(context,path+"//"+listFile);
+            dc.InitDummyItem(context,path+"/"+listFile);
             /*
             读取当前文件info 包括名字 数值
              */
-            InputStream is = context.getAssets().open(path+"//"+listFile+"//info.txt");
-            int lenght = is.available();
-            byte[]  buffer = new byte[lenght];
-            is.read(buffer);
-            String cont = new String(buffer, "utf8");
-            UpperItem ui = new UpperItem(listFile,cont,dc.ITEMS,secui.ITEMS,true);
+            String cont = getString(context, path + "/" + listFile + "/info.txt");
+            UpperItem ui = new UpperItem(listFile,cont,dc.ITEMS,secui.UpITEMS,true);
             ITEMS.add(ui);
             ITEM_MAP.put(ui.upid,ui);
+            Log.i("firstupitem",path + "/" + listFile + "/info.txt"+ui.upcontent+"\n");
         }
     }
+
     /*
     二级列表初始化 path不带// 继续寻找path目录下文件夹 进入文件夹对文件夹建立dummycontent项
      */
-    static void InitSecondUpperItem(Context context,String path) throws IOException {
+    void InitSecondUpperItem(Context context,String path) throws IOException {
         String[] listFiles = context.getAssets().list(path);
+        UpITEMS.clear();
         for(String listFile : listFiles){// /wiki/1/2
             /*
             过滤txt文件 去掉/wiki/1/code.txt
@@ -71,18 +72,15 @@ public class UpperContent extends DummyContent{
             文件夹目录构建具体dummycontent类
              */
             DummyContent dc=new DummyContent();
-            dc.InitDummyItem(context,path+"//"+listFile);
+            dc.InitDummyItem(context,path+"/"+listFile);
             /*
             读取当前文件info 包括名字 数值
              */
-            InputStream is = context.getAssets().open(path+"//"+listFile+"//info.txt");
-            int lenght = is.available();
-            byte[]  buffer = new byte[lenght];
-            is.read(buffer);
-            String cont = new String(buffer, "utf8");
+            String cont = getString(context, path+"/"+listFile+ "/info.txt");
             UpperItem ui = new UpperItem(listFile,cont,dc.ITEMS,false);
-            ITEMS.add(ui);
+            UpITEMS.add(ui);
             ITEM_MAP.put(ui.upid,ui);
+            Log.i("secondupitem",path + "/" + listFile + "/info.txt"+ui.upcontent+"\n");
         }
     }
 

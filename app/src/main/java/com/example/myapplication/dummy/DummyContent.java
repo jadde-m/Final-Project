@@ -1,9 +1,11 @@
 package com.example.myapplication.dummy;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,7 @@ public class DummyContent {
     /**
      * dummy item表
      */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public List<DummyItem> ITEMS = new ArrayList<DummyItem>();
 
     /**
      * dummy item哈希表，用于初始化dummyitem
@@ -26,49 +28,52 @@ public class DummyContent {
     public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
     private static final int COUNT = 25;
-    private static String detailpath = "//detail//";
-    static void InitDummyItem(Context context,String path){
+    private static String detailpath = "detail/";
+    public void InitDummyItem(Context context, String path){
         /*
         初始化方法：传入context 文件路径path
          */
+        //ITEMS.clear();
         try {
-            String fileNames[] = context.getAssets().list(path);
+            String fileids[] = getString(context,path+"/dummyitemidlist.txt").split("\n");
             /*
             遍历文件，判断path下文件
              */
-            for (String fileName : fileNames){
-                if(Pattern.compile("[0-9]*.*txt").matcher(fileName).matches()){
-                    String id = fileName.replace(".txt","");
-                    String fileInfos[]=context.getAssets().list(detailpath+id);
-                    String name=null,content=null,point=null;
-                    for (String fileInfo : fileInfos){
-                        if(fileInfo.contains("point")){
-                            point=fileInfo.replace("point ","");
-                        }else if(fileInfo.contains("name")){
-                            InputStream is = context.getAssets().open(detailpath+id+"//"+fileInfo);
-                            int lenght = is.available();
-                            byte[]  buffer = new byte[lenght];
-                            is.read(buffer);
-                            name = new String(buffer, "utf8");
-                        }else if(fileInfo.contains("info")){
-                            InputStream is = context.getAssets().open(detailpath+id+"//"+fileInfo);
-                            int lenght = is.available();
-                            byte[]  buffer = new byte[lenght];
-                            is.read(buffer);
-                            content = new String(buffer, "utf8");
-                        }
+            for (String fileid : fileids){
+                String fileInfos[]=context.getAssets().list(detailpath+fileid);
+                String name=null,content=null,point=null;
+                for (String fileInfo : fileInfos){
+                    if(fileInfo.contains("name")){
+                        name = getString(context,detailpath+fileid+"/"+fileInfo);
+                    }else if(fileInfo.contains("info")){
+                        content = getString(context,detailpath+fileid+"/"+fileInfo);
+                    }else if(fileInfo.contains(".txt")){
+                        point=fileInfo.replace(".txt","");
                     }
-                    addItem(new DummyItem(id,name,content,point));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+                    Log.i("dummyiteminfo",detailpath + "/" +fileid+fileInfo + "\n");
+                }
+                addItem(new DummyItem(fileid,name,content,point));
+                //Log.i("dummyitem",detailpath + "/" +fileid+name+content+point + "\n");
+                }
+            } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
 
     }
 
-    private static void addItem(DummyItem item) {
+    public static String getString(Context context, String path) throws IOException {
+        InputStream is = context.getAssets().open(path);
+        int lenght = is.available();
+        byte[]  buffer = new byte[lenght];
+        is.read(buffer);
+        return (new String(buffer, "utf8"));
+    }
+
+
+    private void addItem(DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }

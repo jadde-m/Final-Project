@@ -13,6 +13,7 @@ import com.example.myapplication.dummy.UpperContent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.myapplication.dummy.DummyContent;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,18 +32,22 @@ import java.util.List;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ItemListActivity extends AppCompatActivity {
+public class ItemListActivity extends AppCompatActivity /*implements Runnable*/{
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private boolean mTwoPane;
-
+    static View uprecyclerView;
+    static View dummyrecyclerView;
+   // Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
+
+        Log.i("start","for starts");
 /**
  * 浮动按钮功能
  */
@@ -74,38 +80,90 @@ public class ItemListActivity extends AppCompatActivity {
         /*
         !!!!!!!!!!!!设置listitem项
          */
-        View recyclerView = findViewById(R.id.item_list);
+        /*View recyclerView = findViewById(R.id.item_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView((RecyclerView) recyclerView);*/
         /*
         ！！！！！！ 设置upitemlist项
          */
-        View uprecyclerView = findViewById(R.id.upitem_list);
+        uprecyclerView = findViewById(R.id.upitem_list);
         assert uprecyclerView != null;
-        setupUpRecyclerView((RecyclerView) uprecyclerView);
+        dummyrecyclerView= findViewById(R.id.item_list);
+        assert uprecyclerView != null;
+        UpperContent uc = new UpperContent();
+        try {
+            uc.InitFirstUpperItem(this);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ((RecyclerView) uprecyclerView).setAdapter(new UpItemRecyclerViewAdapter(this,uc.ITEMS));
+       /* Thread t = new Thread(this);
+        t.start();
+        handler=new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+            }
+        };*/
     }
+
+/*
+    @Override
+    public void run() {
+        // Message msg = handler.obtainMessage(2);
+        //setupUpRecyclerView((RecyclerView) uprecyclerView);
+        try {
+
+            View uprecyclerView = findViewById(R.id.upitem_list);
+            assert uprecyclerView != null;
+
+            UpperContent uc = new UpperContent();
+            uc.InitFirstUpperItem(this);
+            ((RecyclerView) uprecyclerView).setAdapter(new UpItemRecyclerViewAdapter(uc.UPITEMS));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //msg.obj =
+
+    }
+*/
+
     /*
     dummyitemlist项初始化
      */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new DummyItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        //recyclerView.setAdapter(new DummyItemRecyclerViewAdapter(this, DummyContent.ITEMS));
     }
+
+    public void returnmethod(View view) {
+        uprecyclerView = findViewById(R.id.upitem_list);
+        assert uprecyclerView != null;
+        UpperContent uc = new UpperContent();
+        try {
+            uc.InitFirstUpperItem(this);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ((RecyclerView) uprecyclerView).setAdapter(new UpItemRecyclerViewAdapter(this,uc.ITEMS));
+    }
+
 
     public static class DummyItemRecyclerViewAdapter
             extends RecyclerView.Adapter<DummyItemRecyclerViewAdapter.ViewHolder> {
 
         private final ItemListActivity mParentActivity;
         private final List<DummyContent.DummyItem> mValues;
-        private final boolean mTwoPane;
         /*
         初始化函数
          */
         DummyItemRecyclerViewAdapter(ItemListActivity parent,
-                                     List<DummyContent.DummyItem> items,
-                                     boolean twoPane) {
+                                     List<DummyContent.DummyItem> items) {
             mValues = items;
             mParentActivity = parent;
-            mTwoPane = twoPane;
         }
         /*
         初始化点击方法
@@ -117,21 +175,11 @@ public class ItemListActivity extends AppCompatActivity {
              */
             public void onClick(View view) {
                 DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                Context context = view.getContext();
+                Intent intent = new Intent(context, ItemDetailActivity.class);
+                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                context.startActivity(intent);
 
-                    context.startActivity(intent);
-                }
             }
         };
 
@@ -150,10 +198,11 @@ public class ItemListActivity extends AppCompatActivity {
         /*
             初始化子项数据
          */
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
            // holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).name);
-
+            holder.mContentView.setText(mValues.get(position).details);
+            holder.mPointView.setText(mValues.get(position).point);
+            holder.mnameView.setText(mValues.get(position).name);
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
         }
@@ -164,13 +213,14 @@ public class ItemListActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            //final TextView mIdView;
+            final TextView mnameView;
             final TextView mContentView;
-
+            final TextView mPointView;
             ViewHolder(View view) {
                 super(view);
-                //mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mnameView = (TextView) view.findViewById(R.id.dummyitemname);
+                mContentView = (TextView) view.findViewById(R.id.dummycontent);
+                mPointView = (TextView) view.findViewById(R.id.point);
             }
         }
     }
@@ -178,22 +228,23 @@ public class ItemListActivity extends AppCompatActivity {
 /*
     upitemlist项初始化
  */
-    private void setupUpRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new UpItemRecyclerViewAdapter(this, UpperContent.UPITEMS));
+    private void setupUpRecyclerView(@NonNull RecyclerView recyclerView) throws IOException {
+
+        //recyclerView.setAdapter(new UpItemRecyclerViewAdapter(this, uc.UPITEMS));
     }
     public static class UpItemRecyclerViewAdapter
             extends RecyclerView.Adapter<UpItemRecyclerViewAdapter.ViewHolder> {
 
-        private final ItemListActivity mParentActivity;
+        //private final ItemListActivity mParentActivity;
         private final List<UpperContent.UpperItem> mValues;
+        private final ItemListActivity mParentAct;
 
         /*
         初始化函数
          */
-        UpItemRecyclerViewAdapter(ItemListActivity parent,
-                                  List<UpperContent.UpperItem> upitems) {
+        UpItemRecyclerViewAdapter(ItemListActivity itemListActivity, List<UpperContent.UpperItem> upitems) {
             mValues = upitems;
-            mParentActivity = parent;
+            mParentAct = itemListActivity;
         }
         /*
         点击事件：点击显示一组upperitem+dummyitem
@@ -204,24 +255,18 @@ public class ItemListActivity extends AppCompatActivity {
             点击相应函数
              */
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                /*
-                if (mTwoPane) {
-
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
+                UpperContent.UpperItem item = (UpperContent.UpperItem)view.getTag();
+                if (item.flag) {
+                    ((RecyclerView) uprecyclerView).setAdapter(new UpItemRecyclerViewAdapter(mParentAct, item.uplist));
+                    ((RecyclerView) dummyrecyclerView).setAdapter(new DummyItemRecyclerViewAdapter(mParentAct,item.dummylist));
                 } else {
-                    Context context = view.getContext();
+                    ((RecyclerView) dummyrecyclerView).setAdapter(new DummyItemRecyclerViewAdapter(mParentAct,item.dummylist));
+                    /*Context context = view.getContext();
                     Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                    //intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
 
-                    context.startActivity(intent);
-                }*/
+                    context.startActivity(intent);*/
+                }
             }
         };
 
@@ -230,20 +275,16 @@ public class ItemListActivity extends AppCompatActivity {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.dummytitem_list_content, parent, false);
+                    .inflate(R.layout.upperitem_list_content, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            // holder.mIdView.setText(mValues.get(position).id);
-            /*
-            传值，设置holder的量
-             holder.mContentView.setText(mValues.get(position).upitemlist);
-
+            holder.mIdView.setText(mValues.get(position).upcontent);
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
-             */
+
 
         }
 
@@ -253,14 +294,13 @@ public class ItemListActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            //final TextView mIdView;
-            final TextView mContentView;
+            final TextView mIdView;
 
             ViewHolder(View view) {
                 super(view);
-                //mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                mIdView = (TextView) view.findViewById(R.id.upitemcontent);
             }
         }
     }
+
 }
